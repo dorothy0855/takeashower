@@ -716,12 +716,12 @@ function navigate(el) {
 //  CLAUDE API
 // ═══════════════════════════════════════════════
 async function callClaude(prompt) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://fnvwrhccijhuceymhjvp.supabase.co/functions/v1/clever-worker', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'anthropic-version': '2023-06-01',
-      'x-api-key': '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',
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZudndyaGNjaWpodWNleW1oanZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzQwNjMsImV4cCI6MjA5MTIxMDA2M30.k8BYub51DEXzU74uvimHtRHppBltqNDS4C0HV8_MMLM',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZudndyaGNjaWpodWNleW1oanZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzQwNjMsImV4cCI6MjA5MTIxMDA2M30.k8BYub51DEXzU74uvimHtRHppBltqNDS4C0HV8_MMLM',
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
