@@ -1002,7 +1002,12 @@ ${product?'향 특성: '+PRODUCT_SCENES[product]:''}
 톤: ${document.querySelector('#g-tone .chip.active')?.dataset.v||'균형'}
 길이: ${document.querySelector('#g-length .chip.active')?.dataset.v||'보통'}
 
-조건: 고정 포맷 우선 사용, 감정→장면→제품 흐름 필수, 서로 다른 스타일 5개, 직접 구매 유도 금지
+조건:
+- 5개 카피는 반드시 서로 완전히 다른 스타일로 작성 (같은 포맷 반복 금지)
+- 고정 포맷("오늘은 ___한 날이었죠?")은 5개 중 1~2개만 사용
+- 나머지는 장면묘사형, 감정독백형, 짧은임팩트형, 여운형 등 다양하게
+- 감정→장면→제품 흐름 필수
+- 직접 구매 유도 금지
 JSON: {"copies":[{"text":"","tone":"","use_case":""},{"text":"","tone":"","use_case":""},{"text":"","tone":"","use_case":""},{"text":"","tone":"","use_case":""},{"text":"","tone":"","use_case":""}]}`;
 
     genResult = await callClaude(prompt);
