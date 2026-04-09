@@ -528,9 +528,15 @@ const SYSTEM_PROMPT = `당신은 테이크어샤워(Take a Shower) 브랜드의 
 - 샤워 = 감정 전환 / 제품이 아니라 "샤워하는 그 순간"을 판다
 - 감정 → 장면 → 향 → 제품 → 구매 흐름 필수
 
-[고정 카피 포맷 - 최우선]
-"오늘은 ___한 날이었죠? 이럴 땐 ___로 씻으세요 →"
-"오늘은 ___한 날이었죠? ___향으로 씻고 나면 달라져요 →"
+[카피 스타일 - 반드시 다양하게]
+5개를 생성할 때 아래 스타일을 골고루 섞어서 사용하세요:
+1. 고정 포맷: "오늘은 ___한 날이었죠? 이럴 땐 ___로 씻으세요 →"
+2. 장면 묘사형: 욕실 장면, 물, 향 등 감각적 장면으로 시작
+3. 감정 독백형: 오늘 하루의 감정을 1인칭으로 표현
+4. 짧은 임팩트형: 2~3줄의 짧고 강렬한 문장
+5. 여운형: 샤워 후의 변화된 감정을 여운 있게 표현
+
+같은 포맷을 반복하지 말고 각각 완전히 다른 스타일로 써주세요.
 
 [브랜드 언어 규칙]
 ✔ 권장: 샤워, 물, 욕실, 순간, 오늘, 흘려보내다, 머무르다, 돌아오다, 리셋, 잔향
@@ -1174,31 +1180,45 @@ function updateHistFilterBtns() {
   });
 }
 
+function deleteHistory(realIdx) {
+  historyList.splice(realIdx, 1);
+  localStorage.setItem('tas_history', JSON.stringify(historyList));
+  renderHistoryList();
+  showToast('삭제되었습니다');
+}
+
 function renderHistoryList() {
   const el = document.getElementById('history-list');
   if (!el) return;
+
+  // 필터링하되 원본 인덱스 보존
   const list = historyList
-    .filter(h => histFilter==='전체' || h.type===histFilter)
-    .filter(h => !histSearch || JSON.stringify(h).toLowerCase().includes(histSearch.toLowerCase()));
+    .map((h, realIdx) => ({ h, realIdx }))
+    .filter(({ h }) => histFilter==='전체' || h.type===histFilter)
+    .filter(({ h }) => !histSearch || JSON.stringify(h).toLowerCase().includes(histSearch.toLowerCase()));
 
   if (!list.length) {
     el.innerHTML = `<div style="text-align:center;padding:60px 0;color:var(--text3);font-size:13px;">저장된 항목이 없습니다</div>`;
     return;
   }
-  el.innerHTML = list.map((h,i)=>`
+
+  el.innerHTML = list.map(({ h, realIdx }) => `
   <div class="panel" style="margin-bottom:12px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div style="display:flex;gap:8px;align-items:center;">
         <span class="badge ${h.type==='검수'?'badge-admin':'badge-staff'}">${h.type}</span>
         ${h.user?`<span style="font-size:11px;color:var(--text3);">${h.user}</span>`:''}
       </div>
-      <span style="font-size:11px;color:var(--text3);">${new Date(h.date).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:11px;color:var(--text3);">${new Date(h.date).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteHistory(${realIdx})">삭제</button>
+      </div>
     </div>
     ${h.type==='검수' && h.input ? `<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">원본: ${h.input.substring(0,60)}${h.input.length>60?'...':''}</div>` : ''}
     ${h.type==='검수' && h.result?.revisions?.balanced ? `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
       <div style="font-family:var(--font-serif);font-size:13px;color:var(--text);line-height:1.8;flex:1;">${h.result.revisions.balanced}</div>
-      <button class="btn btn-secondary btn-sm" onclick="copyText(\`${h.result.revisions.balanced.replace(/`/g,"'")}\`)">복사</button>
+      <button class="btn btn-secondary btn-sm" onclick="copyText(\`${h.result.revisions.balanced.replace(/\`/g,"'")}\`)">복사</button>
     </div>
     ${h.result.score!==undefined?`<div style="margin-top:8px;font-size:11px;font-weight:700;color:${scoreColor(h.result.score)};">점수: ${h.result.score}</div>`:''}` : ''}
     ${h.type==='생성' && h.result?.copies ? `
@@ -1206,7 +1226,7 @@ function renderHistoryList() {
       ${h.result.copies.slice(0,2).map(c=>`
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
         <div style="font-family:var(--font-serif);font-size:13px;color:var(--text);line-height:1.8;flex:1;">${c.text}</div>
-        <button class="btn btn-secondary btn-sm" onclick="copyText(\`${c.text.replace(/`/g,"'")}\`)">복사</button>
+        <button class="btn btn-secondary btn-sm" onclick="copyText(\`${c.text.replace(/\`/g,"'")}\`)">복사</button>
       </div>`).join('')}
     </div>` : ''}
   </div>`).join('');
